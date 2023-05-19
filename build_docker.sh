@@ -1,10 +1,13 @@
 #!/bin/bash
 # Author: fmonera@opensistemas.com
 
+MINOR=$1
+
 V=16.0
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-ODOO_RELEASE=$(cat ./$V/Dockerfile | grep "ENV ODO_RELEASE" | cut -d= -f2)
-ODOO_SHA=$(cat ./$V/Dockerfile | grep "ENV ODO_SHA" | cut -d= -f2)
+cd $V
+ODOO_RELEASE=$( cat Dockerfile  | grep "ARG ODOO_RELEASE" | cut -d= -f2 ) 
+ODOO_SHA=$(cat Dockerfile | grep "ARG ODOO_SHA" | cut -d= -f2 )
 
 if test -f "$SCRIPT_DIR/config/env"; then
   source $SCRIPT_DIR/config/env 
@@ -15,25 +18,27 @@ else
   exit
 fi
 
-echo "Current release: $ODO_RELEASE"
-echo "Current SHA: $ODO_SHA"
-echo "Docker tag: $DOCKER_TAG"
-echo "App Image: $APP_IMAGE"
+echo "Current release: $ODOO_RELEASE"
+echo "Current SHA: $ODOO_SHA"
+echo "Added Minor Version: $MINOR"
+echo "Docker tags: "
+echo "  - $DOCKER_TAG:$ODOO_RELEASE$MINOR"
+echo "  - $DOCKER_TAG:latest"
 echo
 echo "Press ENTER to start ..."
 read a
 
-echo $ODO_RELEASE > $SCRIPT_DIR/VERSION
+echo $ODOO_RELEASE$MINOR > $SCRIPT_DIR/VERSION
 
 
 # Build
 cd $SCRIPT_DIR/$V
 docker build -t $DOCKER_TAG:latest .
-docker tag $DOCKER_TAG:latest $DOCKER_TAG:$ODO_RELEASE
-docker push $DOCKER_TAG:$ODO_RELEASE
+docker tag $DOCKER_TAG:latest $DOCKER_TAG:$ODOO_RELEASE$MINOR
+docker push $DOCKER_TAG:$ODOO_RELEASE$MINOR
 docker push $DOCKER_TAG:latest
 
 echo "Uploaded:"
-echo "  $DOCKER_TAG:$ODO_RELEASE"
+echo "  $DOCKER_TAG:$ODOO_RELEASE$MINOR"
 echo "  $DOCKER_TAG:latest"
 
