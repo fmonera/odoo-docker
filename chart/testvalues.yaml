@@ -1,0 +1,160 @@
+global:
+  # If you will use a private registry to download the images, you
+  # must set this to "true" and specify the name of the existing
+  # secret in the same namespace containing the access credentials 
+  # for the registry.
+  privateRegistry:
+    enabled: true
+    secretName: lws-registry
+
+app:
+  # Number of replicas of the frontend. Requires all replicas (and sidekiq) to 
+  # read and write to the same shared storage. So it requires a volume with RWX mode,
+  # such as NFS, CephFS or longhorn (NFS based too).
+  # Or you can run all replicas and sidekiq on the same node and use a local path
+  # provisioner.
+  replicas: 1
+  
+  # Full image path
+  image: reg.wallstreetlocos.com/lws/go
+  targetRevision: 12.7.0
+  imagePullPolicy: Always  
+  
+mysql:
+  # Set to true if you want helm to deploy a percona server and create the DB.
+  server:
+    # Set to true to install a single instance percona server and perform the
+    # initialization of the database automatically.
+    enabled: true
+
+    persistence:
+      # Enable and configure server persistence to keep data between restarts.
+      enabled: true
+
+      # Set the name of the Persistent Volume Claim. In case you already have a PVC 
+      # created, set the name of that PVC. Otherwise this is the name of the PVC that
+      # will be created.
+      claimName: db-pvc
+
+      # Enable to use your already existing PVC. This way it will not create it's own
+      # persistant volume.
+      existingClaim:
+        enabled: false
+
+      # In case you don't use an already existing claim, the following values will create
+      # a volume for you.
+
+      # Specify the storage class to create the PVC. Set empty to use the default storage
+      # class configured in the cluster.
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      ##   GKE, AWS & OpenStack)
+      storageClass: "local-path"
+
+      # Access mode must be ReadWriteMany, unless you limit all the instances (including
+      # sidekiq) to the same node.
+      accessMode: ReadWriteOnce
+
+      # Size of the PVC
+      size: 10Gi
+
+  # Mysql configuration for external or internal mysql.
+   
+  # Root password needed to create the database
+  MYSQL_ROOT_PASSWORD: changeme
+
+  # Default server for a percona xtradb cluster on pxc namespace.
+  DB_HOST: percona
+
+  # MySQL port.
+  DB_PORT: 3306
+
+  # Name of the database. Must already be created.
+  MYSQL_DATABASE: go
+
+  # Username with full privileges to the database.
+  MYSQL_USER: go
+
+  # Password.
+  MYSQL_PASSWORD: gopass
+
+environment:
+  # We should set this as true unless you know what you are 
+  # doing. HTTPS will bre provided by ingress.
+  FORCE_HTTP: true
+
+  # Set this to the redis server. If it is in the same namespace
+  # as go, it will be redis or redis-master.
+  REDIS_HOST: go-redis-master
+
+  # Set timezone
+  TZ: Europe/Madrid
+
+  # There is no need to change any of these.
+  RAILS_SERVE_STATIC_FILES: "1"
+  RAILS_LOG_TO_STDOUT: "1"
+
+service:
+  port: "3000"
+
+persistence:
+  # Set the name of the Persistent Volume Claim. In case you already have a PVC 
+  # created, set the name of that PVC. Otherwise this is the name of the PVC that
+  # will be created.
+  claimName: gofiles-pvc
+
+  # Enable to use your already existing PVC. This way it will not create it's own
+  # persistant volume.
+  existingClaim: 
+    enabled: false
+
+  # In case you don't use an already existing claim, the following values will create
+  # a volume for you.
+  
+  # Specify the storage class to create the PVC. Set empty to use the default storage
+  # class configured in the cluster.
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  storageClass: "longhorn"
+
+  # Access mode must be ReadWriteMany, unless you limit all the instances (including
+  # sidekiq) to the same node.
+  accessMode: ReadWriteMany
+
+  # Size of the PVC
+  size: 10Gi
+  
+ingress:
+  enabled: true
+
+  # Set ingress annotations. Example:
+  annotations:
+    cert-manager.io/cluster-issuer: issuer-cloudflare-prod
+
+  # Ingress Class Name
+  ingressClassName: nginx
+
+  # Host name
+  host: test1.fmonera.com
+
+  # TLS Secret name
+  tls:
+    enabled: true
+    secretName: go-tls-secret
+
+redis:
+  architecture: standalone # standalone / replication
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+  replica:
+    persistence:
+      enabled: false
+

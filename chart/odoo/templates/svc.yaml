@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: odoo
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8069
+    protocol: TCP
+    targetPort: {{ .Values.service.port }}
+    name: odoo
+  selector:
+    app: odoo

@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: "20230517"
+description: odoo
+name: odoo
+type: application
+version: 0.0.1

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: odoo-config
+data: 
+  # POSTGRESQL Config
+  HOST: {{ .Values.postgresql.HOST }}
+  PORT: {{ .Values.postgresql.PORT }}
+  USER: {{ .Values.postgresql.USER }}
+  PASSWORD: {{ .Values.postgresql.PASSWORD }}

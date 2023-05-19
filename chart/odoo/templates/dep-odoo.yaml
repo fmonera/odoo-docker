@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: odoo
+  name: odoo
+spec:
+  replicas: {{ .Values.app.replicas }}
+  selector:
+    matchLabels: 
+      app: odoo
+  template:
+    metadata:
+      labels:
+        app: odoo
+    spec:
+      {{ if .Values.global.privateRegistry.enabled }}
+      imagePullSecrets:
+      - name: {{ .Values.global.privateRegistry.secretName }}
+      {{ end }}
+      containers:
+      - name: odoo
+        image: {{ printf "%s:%s" .Values.app.image .Values.app.targetRevision }}
+        imagePullPolicy: {{ .Values.app.imagePullPolicy }}
+        readinessProbe:
+          tcpSocket:
+            host: 
+            port: 8069
+          initialDelaySeconds: 90
+        envFrom:
+        - configMapRef:
+            name: odoo-config
+        volumeMounts:
+        - name: files
+          mountPath: /var/lib/odoo
+        - name: addons
+          mountPath: /mnt/extra-addons
+        ports:
+        - containerPort: 8069
+          protocol: TCP
+          name: odooport
+      volumes:
+      - name: files
+        persistentVolumeClaim: 
+          claimName: {{ .Values.persistence.files.claimName }}
+      - name: addons
+        persistentVolumeClaim: 
+          claimName: {{ .Values.persistence.addons.claimName }}
+
