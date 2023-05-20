@@ -32,6 +32,7 @@ RUN apt-get update && \
         python3-xlwt \
         python3-pandas \
         python3-unidecode \
+        python3-cachetools \
         vim \
         xz-utils \
     && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb \
