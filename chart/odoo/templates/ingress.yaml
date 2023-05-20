@@ -5,6 +5,8 @@ metadata:
   annotations:
     {{ .Values.ingress.annotations | toYaml | nindent 4 }}
   name: odoo
+  nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  nginx.ingress.kubernetes.io/proxy-body-size: 99999999m
 spec:
   ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
