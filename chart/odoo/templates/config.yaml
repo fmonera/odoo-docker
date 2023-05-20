@@ -5,6 +5,6 @@ metadata:
 data: 
   # POSTGRESQL Config
   HOST: {{ .Values.postgresql.HOST }}
-  PORT: {{ .Values.postgresql.PORT }}
+  PORT: {{ .Values.postgresql.PORT | quote }}
   USER: {{ .Values.postgresql.USER }}
   PASSWORD: {{ .Values.postgresql.PASSWORD }}
