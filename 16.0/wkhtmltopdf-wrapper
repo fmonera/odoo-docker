@@ -1,0 +1,19 @@
+#!/bin/bash
+# Author: Fernando Monera - fmonera@opensistemas.com
+#
+# When calling wkhtmltopdf, the html template files are created
+# with http:// urls instead of https://
+# This is probably due to running behind a proxy on kubernetes.
+# This is a temporary fix until we find the correct configuration
+# of odoo/kubernetes.
+
+APP="$0"
+PARAM="$*"
+BIN="$APP-bin"
+
+for file in /tmp/*html; do
+  sed -i 's/href="http:\/\//href="https:\/\//g' "$file"
+done
+
+$BIN $PARAM
+
