@@ -33,6 +33,9 @@ RUN apt-get update && \
         python3-pandas \
         python3-unidecode \
         python3-cachetools \
+        sudo \
+        wget \
+        procps \
         vim \
         xz-utils \
     && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb \
@@ -84,6 +87,9 @@ EXPOSE 8069 8071 8072
 ENV ODOO_RC /etc/odoo/odoo.conf
 
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
+
+# Permitir a odoo usar sudo sin contraseña
+RUN echo 'odoo ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/odoo
 
 # Set default user when running the container
 USER odoo
