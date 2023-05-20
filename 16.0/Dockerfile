@@ -6,6 +6,9 @@ SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 # Generate locale C.UTF-8 for postgres and general locale data
 ENV LANG C.UTF-8
 
+# Add contrib 
+RUN echo "deb http://deb.debian.org/debian/ bullseye contrib" >> /etc/apt/sources.list
+
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -33,6 +36,7 @@ RUN apt-get update && \
         python3-pandas \
         python3-unidecode \
         python3-cachetools \
+        ttf-mscorefonts-installer \
         sudo \
         wget \
         procps \
