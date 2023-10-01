@@ -1,6 +1,8 @@
-About this Repo
-======
+# Odoo Notes
 
-This is the Git repo of the official Docker image for [Odoo](https://registry.hub.docker.com/_/odoo/). See the Hub page for the full readme on how to use the Docker image and for information regarding contributing and issues.
+Ensure that your database user has permissions to create databases. This way you can use the Database Manager https://odoo.yourdomain/web/database/manager :
 
-The full readme is generated over in [docker-library/docs](https://github.com/docker-library/docs), specifically in [docker-library/docs/odoo](https://github.com/docker-library/docs/tree/master/odoo).
+``` sql
+ALTER USER odoo CREATEDB;
+```
+
