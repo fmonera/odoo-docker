@@ -25,6 +25,6 @@ fi
 
 echo "Pushing package $P ..."
 
-helm cm-push --username=fmonera $P wallstreetlocos
+helm push $P oci://reg.paperxp.com/charts
 helm repo update
 
